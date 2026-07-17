@@ -8,6 +8,7 @@
       "version": "22"
     },
     "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
     "installMaven": true
     }
   },

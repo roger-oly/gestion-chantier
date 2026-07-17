@@ -1,9 +1,7 @@
 {
   "name": "Gestion Chantier BTP",
 
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "image": "mcr.microsoft.com/devcontainers/java:21",
 
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
@@ -16,20 +14,12 @@
       "extensions": [
         "vscjava.vscode-java-pack",
         "vmware.vscode-spring-boot",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "ms-azuretools.vscode-docker",
-        "mtxr.sqltools",
-        "mtxr.sqltools-driver-pg"
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
 
-  "forwardPorts": [
-    8080,
-    5173,
-    5432
-  ],
+  "forwardPorts": [8080, 5173, 5432],
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 

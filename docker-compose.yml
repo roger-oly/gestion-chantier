@@ -16,8 +16,6 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/schema:/docker-entrypoint-initdb.d/schema
-      - ./database/data:/docker-entrypoint-initdb.d/data
 
     networks:
       - chantier-network

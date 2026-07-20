@@ -8,8 +8,11 @@
       "version": "22"
     },
     "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
+    "version": "21",
     "installMaven": true
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
     }
   },
 
@@ -23,7 +26,11 @@
     }
   },
 
-  "forwardPorts": [8080, 5173, 5432],
+  "forwardPorts": [
+    8080,
+    5173,
+    5432
+  ],
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 

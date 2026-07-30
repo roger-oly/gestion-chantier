@@ -62,10 +62,10 @@ Les instructions de démarrage seront complétées au fur et à mesure du dével
 - Création du backend Spring Boot
 
 ### Sprint 2
-- Création du frontend React
+- Intégration PostgreSQL
 
 ### Sprint 3
-- Intégration PostgreSQL
+- Création du frontend React
 
 ### Sprint 4
 - Dockerisation complète

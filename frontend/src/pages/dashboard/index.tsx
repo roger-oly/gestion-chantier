@@ -1,9 +1,13 @@
-export default function Dashboard() {
+const Dashboard = () => {
 
   return (
-    <h1>
-      Tableau de bord
-    </h1>
+    <div>
+      <h1>
+        Tableau de bord - Gestion et suivi de chantiers
+      </h1>
+    </div>
   );
 
-}
+};
+
+export default Dashboard;

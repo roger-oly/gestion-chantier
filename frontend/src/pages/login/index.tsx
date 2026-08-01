@@ -1,4 +1,9 @@
+import { login } from "../../services/auth.service";
+import { saveUser } from "../../services/storage.service";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+
 interface LoginForm {
   email: string;
   motDePasse: string;
@@ -19,14 +24,27 @@ export default function Login() {
   formState: {errors},
 } = useForm<LoginForm>();
 
-const onSubmit = (data: LoginForm) => {
+    const navigate = useNavigate();
+    
+    const { loginUser } = useAuth();
 
-  const onSubmit = (data: LoginForm) => {
+    const onSubmit = async (data: LoginForm) => {
 
-  // étape suivante :
-  // appel auth.service.ts
+    try {
 
-};
+    const response = await login(data);
+
+    loginUser(response);
+
+    console.log("Connexion réussie :", response);
+
+    navigate("/dashboard");
+
+  } catch (error) {
+
+    console.log("Erreur de connexion :", error);
+
+  }
 
 };
 

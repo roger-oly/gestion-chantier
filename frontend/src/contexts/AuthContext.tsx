@@ -34,6 +34,7 @@ export function AuthProvider({
   const [user, setUser] = useState(
     getUser()
   );
+  console.log("Utilisateur connecté :", user);
 
 
   function loginUser(userData: any) {

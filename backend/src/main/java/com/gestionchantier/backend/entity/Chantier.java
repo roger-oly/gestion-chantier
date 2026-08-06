@@ -6,6 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "chantier")
 @Getter
@@ -40,6 +41,7 @@ public class Chantier {
 
     @Column(name = "statut", nullable = false, length = 30)
     private String statut;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utilisateur", nullable = false)

@@ -5,11 +5,21 @@ import {
   Box,
 } from "@mui/material";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { useParams } from "react-router-dom";
+
 import ChantierInfo 
 from "../../components/features/chantier/ChantierInfo";
-import ChantierTabs from "../../components/features/chantier/ChantierTabs";
 
+import ChantierTabs 
+from "../../components/features/chantier/ChantierTabs";
+
+import { getChantierById } 
+from "../../services/chantier.service";
+
+import type { Chantier } 
+from "../../types/chantier";
 
 export default function ChantierDetail() {
 
@@ -17,32 +27,45 @@ export default function ChantierDetail() {
   const [tab, setTab] = useState(0);
 
 
-  const chantier = {
+const { id } = useParams();
 
-    nom: "Construction Lycée",
 
-    description:
-      "Construction d'un établissement scolaire moderne",
-
-    localisation:
-      "Abidjan",
-
-    budget:
-      "150 000 000 FCFA",
-
-    dateDebut:
-      "01/05/2026",
-
-    dateFin:
-      "30/09/2026",
-
-    statut:
-      "En cours",
-
-  };
+const [chantier, setChantier] = useState<Chantier | null>(null);
 
 
 
+useEffect(() => {
+
+    async function loadChantier(){
+
+        if(id){
+
+            const data = await getChantierById(
+                Number(id)
+            );
+
+            setChantier(data);
+
+        }
+
+    }
+
+
+    loadChantier();
+
+
+}, [id]);
+
+
+if(!chantier){
+
+    return (
+        <Typography>
+            Chargement du chantier...
+        </Typography>
+    );
+
+}
   return (
 
     <>

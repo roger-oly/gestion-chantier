@@ -1,29 +1,18 @@
 import {
   Typography,
+  Divider
 } from "@mui/material";
+
+
+import type { Chantier } from "../../../types/chantier";
 
 
 interface ChantierInfoProps {
 
-  chantier: {
-
-    nom: string;
-
-    description: string;
-
-    localisation: string;
-
-    budget: string;
-
-    dateDebut: string;
-
-    dateFin: string;
-
-    statut: string;
-
-  };
+  chantier: Chantier;
 
 }
+
 
 
 export default function ChantierInfo({
@@ -34,6 +23,15 @@ export default function ChantierInfo({
   return (
 
     <>
+
+
+      <Typography variant="h5">
+        {chantier.nom}
+      </Typography>
+
+
+      <Divider sx={{my:2}} />
+
 
 
       <Typography>
@@ -47,7 +45,7 @@ export default function ChantierInfo({
 
 
       <Typography>
-        Budget : {chantier.budget}
+        Budget : {chantier.budget} FCFA
       </Typography>
 
 
@@ -57,13 +55,23 @@ export default function ChantierInfo({
 
 
       <Typography>
-        Date fin : {chantier.dateFin}
+        Date fin prévue : {chantier.dateFinPrevue}
       </Typography>
 
 
       <Typography>
         Statut : {chantier.statut}
       </Typography>
+
+
+
+      <Divider sx={{my:2}} />
+
+
+      <Typography>
+        Créé par : {chantier.nomUtilisateur}
+      </Typography>
+
 
 
     </>

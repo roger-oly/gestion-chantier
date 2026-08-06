@@ -12,6 +12,7 @@ import Incidents from "../pages/incidents";
 import Livraisons from "../pages/livraisons";
 import Utilisateurs from "../pages/utilisateurs";
 import Profil from "../pages/profil";
+import CreateChantier from "../pages/chantiers/Create";
 
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
@@ -67,56 +68,101 @@ export default function AppRoutes() {
 
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute>
+          <Dashboard />
+            </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/chantiers"
-          element={<Chantiers />}
+          element={
+          <ProtectedRoute>
+          <Chantiers />
+          </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/chantiers/:id"
-          element={<ChantierDetail />}
+          element={
+            <ProtectedRoute>
+          <ChantierDetail />
+          </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/taches"
-          element={<Taches />}
+          element={
+            <ProtectedRoute>
+          <Taches />
+            </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/documents"
-          element={<Documents />}
+          element={
+            <ProtectedRoute>
+          <Documents />
+            </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/incidents"
-          element={<Incidents />}
+          element={
+            <ProtectedRoute>
+          <Incidents />
+            </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/livraisons"
-          element={<Livraisons />}
+          element={
+            <ProtectedRoute>
+          <Livraisons />
+            </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/utilisateurs"
-          element={<Utilisateurs />}
+          element={
+          <ProtectedRoute>
+          <Utilisateurs />
+          </ProtectedRoute>
+        }
         />
 
 
         <Route
           path="/profil"
-          element={<Profil />}
+          element={
+          <ProtectedRoute>
+          <Profil />
+          </ProtectedRoute>
+        }
         />
+
+        <Route
+        path="/chantiers/nouveau"
+        element={
+        <ProtectedRoute>
+        <CreateChantier />
+        </ProtectedRoute>
+  }
+/>
 
 
       </Route>

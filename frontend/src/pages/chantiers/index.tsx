@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   Button,
   Card,
@@ -9,42 +11,59 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+
 import { Link } from "react-router-dom";
 
+import { getChantiers } from "../../services/chantier.service";
 
-const chantiers = [
-  {
-    id: 1,
-    nom: "Construction Lycée",
-    ville: "Abidjan",
-    debut: "01/05/2026",
-    statut: "En cours",
-  },
-  {
-    id: 2,
-    nom: "Pont Moderne",
-    ville: "Bouaké",
-    debut: "10/06/2026",
-    statut: "En attente",
-  },
-  {
-    id: 3,
-    nom: "Centre administratif",
-    ville: "Yamoussoukro",
-    debut: "15/07/2026",
-    statut: "Terminé",
-  },
-];
+import type { Chantier } from "../../types/chantier";
 
 
 export default function Chantiers() {
+
+
+  const [chantiers, setChantiers] = useState<Chantier[]>([]);
+
+
+  useEffect(() => {
+
+    async function loadChantiers() {
+
+      try {
+
+        const data = await getChantiers();
+
+        console.log("Chantiers reçus :", data);
+
+        setChantiers(data);
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur chargement chantiers :",
+          error
+        );
+
+      }
+
+    }
+
+
+    loadChantiers();
+
+  }, []);
+
 
 
   return (
 
     <>
 
-      <Typography variant="h4" gutterBottom>
+      <Typography
+        variant="h4"
+        gutterBottom
+      >
 
         Chantiers
 
@@ -52,12 +71,11 @@ export default function Chantiers() {
 
 
       <Button
-        variant="contained"
-        sx={{ mb: 2 }}
+      component={Link}
+      to="/chantiers/nouveau"
+      variant="contained"
       >
-
-        + Nouveau
-
+      + Nouveau
       </Button>
 
 
@@ -77,17 +95,21 @@ export default function Chantiers() {
                   Nom
                 </TableCell>
 
+
                 <TableCell>
-                  Ville
+                  Localisation
                 </TableCell>
+
 
                 <TableCell>
                   Début
                 </TableCell>
 
+
                 <TableCell>
                   Statut
                 </TableCell>
+
 
                 <TableCell>
                   Action
@@ -103,9 +125,11 @@ export default function Chantiers() {
             <TableBody>
 
 
-              {chantiers.map((chantier)=>(
+              {chantiers.map((chantier) => (
 
-                <TableRow key={chantier.id}>
+                <TableRow
+                  key={chantier.idChantier}
+                >
 
 
                   <TableCell>
@@ -114,12 +138,12 @@ export default function Chantiers() {
 
 
                   <TableCell>
-                    {chantier.ville}
+                    {chantier.localisation}
                   </TableCell>
 
 
                   <TableCell>
-                    {chantier.debut}
+                    {chantier.dateDebut}
                   </TableCell>
 
 
@@ -128,18 +152,19 @@ export default function Chantiers() {
                   </TableCell>
 
 
-                <TableCell>
+
+                  <TableCell>
 
                     <Button
-                    component={Link}
-                     to={`/chantiers/${chantier.id}`}
+                      component={Link}
+                      to={`/chantiers/${chantier.idChantier}`}
                     >
 
-                     Voir
+                      Voir
 
                     </Button>
 
-                </TableCell>
+                  </TableCell>
 
 
                 </TableRow>

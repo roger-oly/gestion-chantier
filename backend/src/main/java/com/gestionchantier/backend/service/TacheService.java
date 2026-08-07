@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Tache;
 import com.gestionchantier.backend.repository.TacheRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class TacheService {
     public Tache updateTache(Integer id, Tache tache) {
 
         Tache existingTache = tacheRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tache introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tache introuvable"));
 
         existingTache.setTitre(tache.getTitre());
         existingTache.setDescription(tache.getDescription());

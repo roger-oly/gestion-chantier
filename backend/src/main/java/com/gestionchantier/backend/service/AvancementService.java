@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Avancement;
 import com.gestionchantier.backend.repository.AvancementRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class AvancementService {
     public Avancement updateAvancement(Integer id, Avancement avancement) {
 
         Avancement existingAvancement = avancementRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Avancement introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Avancement introuvable"));
 
         existingAvancement.setPourcentage(avancement.getPourcentage());
         existingAvancement.setCommentaire(avancement.getCommentaire());

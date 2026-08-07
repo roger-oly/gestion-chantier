@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Utilisateur;
 import com.gestionchantier.backend.dto.ChantierResponse;
 import com.gestionchantier.backend.dto.ChantierRequest;
@@ -48,10 +49,9 @@ public ChantierService(
 public ChantierResponse getChantierById(Integer id){
 
     Chantier chantier = chantierRepository.findById(id)
-            .orElseThrow(() ->
-                new RuntimeException("Chantier introuvable")
-            );
-
+             .orElseThrow(() ->
+              new ResourceNotFoundException("Chantier introuvable")
+              );
 
     return ChantierResponse.builder()
 
@@ -121,7 +121,7 @@ public ChantierResponse getChantierById(Integer id){
                     request.getIdUtilisateur()
             )
             .orElseThrow(
-                () -> new RuntimeException("Utilisateur introuvable")
+                () -> new ResourceNotFoundException("Utilisateur introuvable")
             );
 
 
@@ -174,7 +174,7 @@ public ChantierResponse getChantierById(Integer id){
             )
 
             .nomUtilisateur(
-                utilisateur.getNom()
+            utilisateur.getNom() + " " + utilisateur.getPrenom()
             )
 
             .build();
@@ -184,22 +184,37 @@ public ChantierResponse getChantierById(Integer id){
     /**
      * Met à jour un chantier.
      */
-    public Chantier updateChantier(Integer id, Chantier chantier) {
+ public ChantierResponse updateChantier(
+        Integer id,
+        ChantierRequest request) {
 
-        Chantier existingChantier = chantierRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chantier introuvable"));
+    Chantier existingChantier = chantierRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Chantier introuvable")
+            );
 
-        existingChantier.setNom(chantier.getNom());
-        existingChantier.setDescription(chantier.getDescription());
-        existingChantier.setLocalisation(chantier.getLocalisation());
-        existingChantier.setBudget(chantier.getBudget());
-        existingChantier.setDateDebut(chantier.getDateDebut());
-        existingChantier.setDateFinPrevue(chantier.getDateFinPrevue());
-        existingChantier.setStatut(chantier.getStatut());
-        existingChantier.setUtilisateur(chantier.getUtilisateur());
+    Utilisateur utilisateur =
+            utilisateurRepository.findById(
+                    request.getIdUtilisateur()
+            )
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Utilisateur introuvable")
+            );
 
-        return chantierRepository.save(existingChantier);
-    }
+    existingChantier.setNom(request.getNom());
+    existingChantier.setDescription(request.getDescription());
+    existingChantier.setLocalisation(request.getLocalisation());
+    existingChantier.setBudget(request.getBudget());
+    existingChantier.setDateDebut(request.getDateDebut());
+    existingChantier.setDateFinPrevue(request.getDateFinPrevue());
+    existingChantier.setStatut(request.getStatut());
+    existingChantier.setUtilisateur(utilisateur);
+
+    Chantier updatedChantier =
+            chantierRepository.save(existingChantier);
+
+    return toResponse(updatedChantier);
+}
 
     /**
      * Supprime un chantier.

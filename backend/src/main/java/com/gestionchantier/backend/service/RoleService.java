@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Role;
 import com.gestionchantier.backend.repository.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class RoleService {
      */
     public Role getRoleById(Integer id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Rôle introuvable"));
+               .orElseThrow(() -> new ResourceNotFoundException("Rôle introuvable"));
     }
 
     /**

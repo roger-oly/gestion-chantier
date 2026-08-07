@@ -1,14 +1,15 @@
 package com.gestionchantier.backend.controller;
 
+import jakarta.validation.Valid;
 import com.gestionchantier.backend.dto.ChantierResponse;
 import com.gestionchantier.backend.dto.ChantierRequest;
-import com.gestionchantier.backend.entity.Chantier;
 import com.gestionchantier.backend.service.ChantierService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Valid
 @RestController
 @RequestMapping("/api/chantiers")
 @CrossOrigin(
@@ -36,22 +37,20 @@ public class ChantierController {
 
     }
 
-   @PostMapping
-    public ChantierResponse saveChantier(
-        @RequestBody ChantierRequest request
-    ) {
-
+  @PostMapping
+public ChantierResponse saveChantier(
+        @Valid @RequestBody ChantierRequest request
+) {
     return chantierService.saveChantier(request);
+}
 
-    }
+ @PutMapping("/{id}")
+public ChantierResponse updateChantier(
+        @PathVariable Integer id,
+        @Valid @RequestBody ChantierRequest request) {
 
-    @PutMapping("/{id}")
-    public Chantier updateChantier(
-            @PathVariable Integer id,
-            @RequestBody Chantier chantier) {
-
-        return chantierService.updateChantier(id, chantier);
-    }
+    return chantierService.updateChantier(id, request);
+}
 
     @DeleteMapping("/{id}")
     public void deleteChantier(@PathVariable Integer id) {

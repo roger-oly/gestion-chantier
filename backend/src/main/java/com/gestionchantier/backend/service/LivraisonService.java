@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Livraison;
 import com.gestionchantier.backend.repository.LivraisonRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class LivraisonService {
     public Livraison updateLivraison(Integer id, Livraison livraison) {
 
         Livraison existingLivraison = livraisonRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Livraison introuvable"));
+               .orElseThrow(() -> new ResourceNotFoundException("Livraison introuvable"));
 
         existingLivraison.setDescription(livraison.getDescription());
         existingLivraison.setDateLivraison(livraison.getDateLivraison());

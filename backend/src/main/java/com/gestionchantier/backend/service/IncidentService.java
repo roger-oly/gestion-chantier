@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Incident;
 import com.gestionchantier.backend.repository.IncidentRepository;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,7 @@ public class IncidentService {
     public Incident updateIncident(Integer id, Incident incident) {
 
         Incident existingIncident = incidentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incident introuvable"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Incident introuvable"));
         existingIncident.setType(incident.getType());
         existingIncident.setDescription(incident.getDescription());
         existingIncident.setGravite(incident.getGravite());

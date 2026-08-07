@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Document;
 import com.gestionchantier.backend.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class DocumentService {
     public Document updateDocument(Integer id, Document document) {
 
         Document existingDocument = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Document introuvable"));
 
         existingDocument.setNom(document.getNom());
         existingDocument.setType(document.getType());

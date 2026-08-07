@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.service;
 
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Utilisateur;
 import com.gestionchantier.backend.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class UtilisateurService {
     public Utilisateur updateUtilisateur(Integer id, Utilisateur utilisateur) {
 
         Utilisateur existingUtilisateur = utilisateurRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         existingUtilisateur.setNom(utilisateur.getNom());
         existingUtilisateur.setPrenom(utilisateur.getPrenom());

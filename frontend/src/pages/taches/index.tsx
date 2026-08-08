@@ -1,3 +1,4 @@
+
 import {
   Button,
   Card,
@@ -10,74 +11,92 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useEffect, useState } from "react";
 
-const taches = [
+import { Link } from "react-router-dom";
 
-  {
-    id: 1,
-    titre: "Fondation",
-    priorite: "Haute",
-    statut: "En cours",
-    responsable: "Jacques",
-  },
+import { getTaches } from "../../services/tache.service";
 
-  {
-    id: 2,
-    titre: "Béton",
-    priorite: "Moyenne",
-    statut: "À faire",
-    responsable: "Ali",
-  },
-
-  {
-    id: 3,
-    titre: "Peinture",
-    priorite: "Faible",
-    statut: "Terminée",
-    responsable: "Jean",
-  },
-
-];
-
+import type { Tache } from "../../types/tache";
 
 
 export default function Taches() {
+
+  const [taches, setTaches] = useState<Tache[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+
+    async function loadTaches() {
+
+      try {
+
+        const data = await getTaches();
+
+        console.log("Tâches reçues :", data);
+
+        setTaches(data);
+
+      } catch (error) {
+
+        console.error(
+          "Erreur chargement des tâches :",
+          error
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    }
+
+    loadTaches();
+
+  }, []);
+
+
+  if (loading) {
+
+    return (
+      <Typography>
+        Chargement des tâches...
+      </Typography>
+    );
+
+  }
 
 
   return (
 
     <>
 
-
       <Typography
         variant="h4"
         gutterBottom
       >
-
         Tâches
-
       </Typography>
 
 
-
       <Button
+        component={Link}
+        to="/taches/nouveau"
         variant="contained"
         sx={{ mb: 2 }}
       >
-
         + Nouvelle
-
       </Button>
-
 
 
       <Card>
 
         <CardContent>
 
-
           <Table>
-
 
             <TableHead>
 
@@ -85,6 +104,10 @@ export default function Taches() {
 
                 <TableCell>
                   Titre
+                </TableCell>
+
+                <TableCell>
+                  Chantier
                 </TableCell>
 
                 <TableCell>
@@ -96,72 +119,60 @@ export default function Taches() {
                 </TableCell>
 
                 <TableCell>
-                  Responsable
-                </TableCell>
-
-                <TableCell>
                   Action
                 </TableCell>
 
-
               </TableRow>
-
 
             </TableHead>
 
 
-
             <TableBody>
 
+              {taches.map((tache) => (
 
-              {taches.map((tache)=>(
-
-
-                <TableRow key={tache.id}>
-
+                <TableRow
+                  key={tache.idTache}
+                >
 
                   <TableCell>
                     {tache.titre}
                   </TableCell>
 
-
                   <TableCell>
-                    {tache.priorite}
+                    {tache.nomChantier}
                   </TableCell>
 
+                  <TableCell>
+                    {tache.niveauPriorite}
+                  </TableCell>
 
                   <TableCell>
                     {tache.statut}
                   </TableCell>
 
-
                   <TableCell>
-                    {tache.responsable}
+
+                    <Button
+                      component={Link}
+                      to={`/taches/${tache.idTache}`}
+                    >
+                      Voir
+                    </Button>
+
                   </TableCell>
-
-
-                  <TableCell>
-                    Modifier
-                  </TableCell>
-
 
                 </TableRow>
 
-
               ))}
-
 
             </TableBody>
 
-
           </Table>
-
 
         </CardContent>
 
-
       </Card>
-
 
     </>
 

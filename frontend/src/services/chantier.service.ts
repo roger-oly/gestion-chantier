@@ -1,6 +1,6 @@
 import api from "./api";
 
-import type { Chantier } from "../types/chantier";
+import type { Chantier, ChantierRequest } from "../types/chantier";
 
 
 export async function getChantiers(): Promise<Chantier[]> {
@@ -27,34 +27,28 @@ export async function getChantierById(
 
 
 export async function createChantier(
-    chantier:any
-){
+  chantier: ChantierRequest
+) {
+  const response = await api.post<Chantier>(
+    "/chantiers",
+    chantier
+  );
 
-    const response =
-        await api.post(
-            "/chantiers",
-            chantier
-        );
-
-    return response.data;
-
+  return response.data;
 }
 
 
 
 export async function updateChantier(
-    id:number,
-    chantier:any
-){
+  id: number,
+  chantier: ChantierRequest
+) {
+  const response = await api.put<Chantier>(
+    `/chantiers/${id}`,
+    chantier
+  );
 
-    const response =
-        await api.put(
-            `/chantiers/${id}`,
-            chantier
-        );
-
-    return response.data;
-
+  return response.data;
 }
 
 

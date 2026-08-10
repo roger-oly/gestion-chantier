@@ -12,3 +12,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+file:
+  upload-dir: uploads/documents

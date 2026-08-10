@@ -1,12 +1,15 @@
-export const saveUser = (user: any) => {
+import type { AuthUser } from "../types/auth";
+
+export const saveUser = (user: AuthUser) => {
+
   localStorage.setItem(
     "user",
     JSON.stringify(user)
   );
+
 };
 
-
-export const getUser = () => {
+export const getUser = (): AuthUser | null => {
 
   const user = localStorage.getItem("user");
 
@@ -17,7 +20,6 @@ export const getUser = () => {
   return JSON.parse(user);
 
 };
-
 
 export const removeUser = () => {
 

@@ -11,49 +11,46 @@ import {
   saveUser,
 } from "../services/storage.service";
 
+import type { AuthUser } from "../types/auth";
 
 interface AuthContextType {
-  user: any;
-  loginUser: (userData: any) => void;
+  user: AuthUser | null;
+  loginUser: (userData: AuthUser) => void;
   logout: () => void;
 }
 
-
 const AuthContext = createContext<AuthContextType | null>(null);
-
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-
 export function AuthProvider({
   children,
 }: AuthProviderProps) {
 
-  const [user, setUser] = useState(
+  const [user, setUser] = useState<AuthUser | null>(
     getUser()
   );
-  console.log("Utilisateur connecté :", user);
 
+  console.log(
+    "Utilisateur connecté :",
+    user
+  );
 
-  function loginUser(userData: any) {
+  function loginUser(userData: AuthUser) {
 
     saveUser(userData);
 
     setUser(userData);
-
   }
-
 
   function logout() {
 
     removeUser();
 
     setUser(null);
-
   }
-
 
   return (
     <AuthContext.Provider
@@ -67,7 +64,6 @@ export function AuthProvider({
     </AuthContext.Provider>
   );
 }
-
 
 export function useAuth() {
 

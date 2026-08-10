@@ -17,6 +17,9 @@ import { useParams, useNavigate, useSearchParams,} from "react-router-dom";
 import ChantierInfo 
 from "../../components/features/chantier/ChantierInfo";
 
+import ChantierDocuments
+from "../../components/features/document/ChantierDocuments";
+
 import ChantierTabs 
 from "../../components/features/chantier/ChantierTabs";
 
@@ -330,14 +333,10 @@ async function handleDelete() {
 
 
             {tab === 3 && (
-
-              <Typography>
-
-                Documents associés
-
-              </Typography>
-
-            )}
+  <ChantierDocuments
+    idChantier={chantier.idChantier}
+  />
+)}
 
 
 

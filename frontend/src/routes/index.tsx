@@ -15,6 +15,8 @@ import TacheDetail from "../pages/taches/Detail";
 import EditTache from "../pages/taches/Edit";
 
 import Documents from "../pages/documents";
+import CreateDocument from "../pages/documents/Create";
+
 import Incidents from "../pages/incidents";
 import Livraisons from "../pages/livraisons";
 import Utilisateurs from "../pages/utilisateurs";
@@ -151,6 +153,15 @@ export default function AppRoutes() {
             </ProtectedRoute>
         }
         />
+
+        <Route
+  path="/documents/nouveau"
+  element={
+    <ProtectedRoute>
+      <CreateDocument />
+    </ProtectedRoute>
+  }
+/>
 
 
         <Route

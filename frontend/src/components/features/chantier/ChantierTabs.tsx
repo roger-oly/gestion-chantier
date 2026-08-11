@@ -34,7 +34,7 @@ export default function ChantierTabs({
 
     >
 
-      <Tab label="Informations" />
+      <Tab label="Détails" />
 
       <Tab label="Tâches" />
 

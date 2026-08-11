@@ -231,7 +231,7 @@ await createTache({
             En cours
           </MenuItem>
 
-          <MenuItem value="Terminée">
+          <MenuItem value="Terminé">
             Terminée
           </MenuItem>
 

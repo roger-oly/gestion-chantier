@@ -1,19 +1,37 @@
 package com.gestionchantier.backend.service;
 
-import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Avancement;
+import com.gestionchantier.backend.entity.Chantier;
+import com.gestionchantier.backend.entity.Tache;
+import com.gestionchantier.backend.entity.Utilisateur;
+import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.repository.AvancementRepository;
+import com.gestionchantier.backend.repository.ChantierRepository;
+import com.gestionchantier.backend.repository.TacheRepository;
+import com.gestionchantier.backend.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class AvancementService {
 
     private final AvancementRepository avancementRepository;
+    private final ChantierRepository chantierRepository;
+    private final TacheRepository tacheRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
-    public AvancementService(AvancementRepository avancementRepository) {
+    public AvancementService(
+            AvancementRepository avancementRepository,
+            ChantierRepository chantierRepository,
+            TacheRepository tacheRepository,
+            UtilisateurRepository utilisateurRepository) {
+
         this.avancementRepository = avancementRepository;
+        this.chantierRepository = chantierRepository;
+        this.tacheRepository = tacheRepository;
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     /**
@@ -24,27 +42,80 @@ public class AvancementService {
     }
 
     /**
-     * Enregistre un nouvel avancement.
+     * Retourne l'historique des avancements d'un chantier.
      */
-    public Avancement saveAvancement(Avancement avancement) {
-        return avancementRepository.save(avancement);
+    public List<Avancement> getAvancementsByChantier(Integer idChantier) {
+
+        return avancementRepository
+                .findByChantier_IdChantierOrderByDateMiseAJourDesc(
+                        idChantier
+                );
     }
 
     /**
-     * Met à jour un avancement.
+     * Calcule l'avancement actuel d'un chantier
+     * à partir des tâches terminées.
      */
-    public Avancement updateAvancement(Integer id, Avancement avancement) {
+public int calculerPourcentage(Integer idChantier) {
 
-        Avancement existingAvancement = avancementRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Avancement introuvable"));
+    List<Tache> taches =
+            tacheRepository.findByChantier_IdChantier(idChantier);
 
-        existingAvancement.setPourcentage(avancement.getPourcentage());
-        existingAvancement.setCommentaire(avancement.getCommentaire());
-        existingAvancement.setDateMiseAJour(avancement.getDateMiseAJour());
-        existingAvancement.setTache(avancement.getTache());
-        existingAvancement.setUtilisateur(avancement.getUtilisateur());
+    if (taches.isEmpty()) {
+        return 0;
+    }
 
-        return avancementRepository.save(existingAvancement);
+    long tachesTerminees = taches.stream()
+            .filter(tache -> {
+                String statut = tache.getStatut();
+
+                return "Terminé".equalsIgnoreCase(statut)
+                        || "Terminée".equalsIgnoreCase(statut);
+            })
+            .count();
+
+    return (int) Math.round(
+            (tachesTerminees * 100.0) / taches.size()
+    );
+}
+
+    /**
+     * Enregistre une validation d'avancement.
+     *
+     * Le pourcentage est calculé automatiquement
+     * à partir des tâches terminées.
+     */
+    public Avancement saveAvancement(
+            Integer idChantier,
+            Integer idUtilisateur,
+            String commentaire) {
+
+        Chantier chantier = chantierRepository
+                .findById(idChantier)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Chantier introuvable"
+                        ));
+
+        Utilisateur utilisateur = utilisateurRepository
+                .findById(idUtilisateur)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Utilisateur introuvable"
+                        ));
+
+        int pourcentage =
+                calculerPourcentage(idChantier);
+
+        Avancement avancement = Avancement.builder()
+                .pourcentage(pourcentage)
+                .commentaire(commentaire)
+                .dateMiseAJour(LocalDateTime.now())
+                .chantier(chantier)
+                .utilisateur(utilisateur)
+                .build();
+
+        return avancementRepository.save(avancement);
     }
 
     /**
@@ -52,6 +123,13 @@ public class AvancementService {
      */
     public void deleteAvancement(Integer id) {
 
-        avancementRepository.deleteById(id);
+        Avancement avancement =
+                avancementRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Avancement introuvable"
+                                ));
+
+        avancementRepository.delete(avancement);
     }
 }

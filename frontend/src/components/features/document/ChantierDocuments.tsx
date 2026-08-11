@@ -255,7 +255,7 @@ export default function ChantierDocuments({
               </TableCell>
 
               <TableCell>
-                Utilisateur
+                Ajouté par
               </TableCell>
 
               <TableCell>

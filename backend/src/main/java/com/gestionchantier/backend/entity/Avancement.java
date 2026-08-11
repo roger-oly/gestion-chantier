@@ -1,5 +1,6 @@
 package com.gestionchantier.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,12 +29,14 @@ public class Avancement {
     @Column(name = "date_mise_a_jour", nullable = false)
     private LocalDateTime dateMiseAJour;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_tache", nullable = false)
-    private Tache tache;
+   @ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_chantier", nullable = false)
+@JsonIgnore
+private Chantier chantier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_utilisateur", nullable = false)
+    @JsonIgnore
     private Utilisateur utilisateur;
 
 }

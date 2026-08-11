@@ -23,6 +23,9 @@ from "../../components/features/document/ChantierDocuments";
 import ChantierTabs 
 from "../../components/features/chantier/ChantierTabs";
 
+import ChantierAvancement
+  from "../../components/features/chantier/ChantierAvancement";
+
 import {
   getChantierById,
   deleteChantier,
@@ -320,15 +323,11 @@ async function handleDelete() {
 )}
 
 
-            {tab === 2 && (
-
-              <Typography>
-
-                Suivi de l'avancement
-
-              </Typography>
-
-            )}
+           {tab === 2 && (
+  <ChantierAvancement
+    idChantier={chantier.idChantier}
+  />
+)}
 
 
 

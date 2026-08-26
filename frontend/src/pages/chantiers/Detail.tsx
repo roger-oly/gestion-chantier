@@ -26,6 +26,9 @@ from "../../components/features/chantier/ChantierTabs";
 import ChantierAvancement
   from "../../components/features/chantier/ChantierAvancement";
 
+import ChantierIncidents
+  from "../../components/features/incident/ChantierIncidents";
+
 import {
   getChantierById,
   deleteChantier,
@@ -338,16 +341,9 @@ async function handleDelete() {
 )}
 
 
-
-            {tab === 4 && (
-
-              <Typography>
-
-                Incidents déclarés
-
-              </Typography>
-
-            )}
+{tab === 4 && (
+  <ChantierIncidents idChantier={chantier.idChantier} />
+)}
 
 
 

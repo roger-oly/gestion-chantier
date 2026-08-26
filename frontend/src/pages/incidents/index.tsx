@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import {
   Button,
   Card,
@@ -10,192 +12,134 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useNavigate } from "react-router-dom";
 
-const incidents = [
+import { getIncidents } from "../../services/incident.service";
+import { Incident } from "../../types/incident";
 
-  {
-    id: 1,
-    type: "Accident",
-    gravite: "Haute",
-    date: "15/06/2026",
-    statut: "Ouvert",
-  },
-
-  {
-    id: 2,
-    type: "Retard",
-    gravite: "Moyenne",
-    date: "18/06/2026",
-    statut: "En cours",
-  },
-
-  {
-    id: 3,
-    type: "Panne",
-    gravite: "Faible",
-    date: "20/06/2026",
-    statut: "Résolu",
-  },
-
-];
-
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 export default function Incidents() {
 
+  const navigate = useNavigate();
+
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+
+  useEffect(() => {
+    const loadIncidents = async () => {
+      try {
+        const data = await getIncidents();
+        setIncidents(data);
+      } catch (error) {
+        console.error(
+          "Erreur chargement des incidents :",
+          error
+        );
+      }
+    };
+
+    loadIncidents();
+  }, []);
 
   return (
-
     <>
-
-
       <Typography
-
         variant="h4"
-
         gutterBottom
-
       >
-
         Incidents
-
       </Typography>
 
-
-
       <Button
-
         variant="contained"
-
         sx={{ mb: 2 }}
-
+        onClick={() => navigate("/incidents/nouveau")}
       >
-
         + Déclarer
-
       </Button>
 
-
-
       <Card>
-
-
         <CardContent>
-
-
           <Table>
 
-
             <TableHead>
-
-
               <TableRow>
-
 
                 <TableCell>
                   Type
                 </TableCell>
 
-
                 <TableCell>
                   Gravité
                 </TableCell>
-
 
                 <TableCell>
                   Date
                 </TableCell>
 
-
                 <TableCell>
                   Statut
                 </TableCell>
-
 
                 <TableCell>
                   Action
                 </TableCell>
 
-
               </TableRow>
-
-
             </TableHead>
-
-
 
             <TableBody>
 
-
-              {incidents.map((incident)=>(
-
+              {incidents.map((incident) => (
 
                 <TableRow
-
-                  key={incident.id}
-
+                  key={incident.idIncident}
                 >
 
-
                   <TableCell>
-
                     {incident.type}
-
                   </TableCell>
 
-
-
                   <TableCell>
-
                     {incident.gravite}
-
                   </TableCell>
 
-
-
-                  <TableCell>
-
-                    {incident.date}
-
-                  </TableCell>
-
-
+                 <TableCell>
+  {formatDate(incident.dateIncident)}
+</TableCell>
 
                   <TableCell>
-
                     {incident.statut}
-
                   </TableCell>
 
-
-
-                  <TableCell>
-
-                    Voir
-
-                  </TableCell>
-
+                <TableCell>
+  <Button
+    size="small"
+    onClick={() =>
+      navigate(`/incidents/${incident.idIncident}`)
+    }
+  >
+    Voir
+  </Button>
+</TableCell>
 
                 </TableRow>
 
-
               ))}
-
-
 
             </TableBody>
 
-
           </Table>
-
-
         </CardContent>
-
-
       </Card>
-
-
     </>
-
   );
-
 }

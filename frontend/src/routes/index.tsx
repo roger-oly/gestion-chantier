@@ -18,6 +18,10 @@ import Documents from "../pages/documents";
 import CreateDocument from "../pages/documents/Create";
 
 import Incidents from "../pages/incidents";
+import CreateIncident from "../pages/incidents/Create";
+import ShowIncident from "../pages/incidents/Show";
+import EditIncident from "../pages/incidents/Edit";
+
 import Livraisons from "../pages/livraisons";
 import Utilisateurs from "../pages/utilisateurs";
 import Profil from "../pages/profil";
@@ -172,6 +176,25 @@ export default function AppRoutes() {
             </ProtectedRoute>
         }
         />
+
+        <Route
+  path="/incidents/nouveau"
+  element={
+    <ProtectedRoute>
+      <CreateIncident />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/incidents/:id"
+  element={<ShowIncident />}
+/>
+
+<Route
+  path="/incidents/:id/modifier"
+  element={<EditIncident />}
+/>
 
 
         <Route

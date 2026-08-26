@@ -1,11 +1,15 @@
 package com.gestionchantier.backend.controller;
 
+import com.gestionchantier.backend.dto.IncidentRequest;
 import com.gestionchantier.backend.entity.Incident;
 import com.gestionchantier.backend.service.IncidentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(
+    origins = "https://fluffy-computing-machine-xrw4qpjx949jh6p5j-5173.app.github.dev"
+)
 @RestController
 @RequestMapping("/api/incidents")
 public class IncidentController {
@@ -21,10 +25,22 @@ public class IncidentController {
         return incidentService.getAllIncidents();
     }
 
-    @PostMapping
-    public Incident saveIncident(@RequestBody Incident incident) {
-        return incidentService.saveIncident(incident);
-    }
+    @GetMapping("/{id}")
+public Incident getIncidentById(@PathVariable Integer id) {
+    return incidentService.getIncidentById(id);
+}
+
+@GetMapping("/chantier/{idChantier}")
+public List<Incident> getIncidentsByChantier(
+        @PathVariable Integer idChantier) {
+
+    return incidentService.getIncidentsByChantier(idChantier);
+}
+
+   @PostMapping
+public Incident saveIncident(@RequestBody IncidentRequest request) {
+    return incidentService.saveIncident(request);
+}
 
     @PutMapping("/{id}")
     public Incident updateIncident(

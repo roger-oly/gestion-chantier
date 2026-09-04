@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  Box,
   Button,
   Card,
   CardContent,
@@ -14,12 +15,18 @@ import {
 } from "@mui/material";
 
 import {
-  getLivraisons,
+  getLivraisonsByChantier,
   Livraison,
-} from "../../services/livraison.service";
+} from "../../../services/livraison.service";
 
-export default function Livraisons() {
-  const navigate = useNavigate();
+interface ChantierLivraisonsProps {
+  idChantier: number;
+}
+
+export default function ChantierLivraisons({
+  idChantier,
+}: ChantierLivraisonsProps) {
+const navigate = useNavigate();
   const [livraisons, setLivraisons] = useState<Livraison[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,11 +34,19 @@ export default function Livraisons() {
   useEffect(() => {
     const loadLivraisons = async () => {
       try {
-        const data = await getLivraisons();
+        setLoading(true);
+        setError(null);
+
+        console.log("ID chantier envoyé :", idChantier);
+
+const data = await getLivraisonsByChantier(idChantier);
+
+console.log("Livraisons reçues :", data);
+
         setLivraisons(data);
       } catch (error) {
         console.error(
-          "Erreur lors du chargement des livraisons :",
+          "Erreur chargement des livraisons :",
           error
         );
 
@@ -44,19 +59,19 @@ export default function Livraisons() {
     };
 
     loadLivraisons();
-  }, []);
+  }, [idChantier]);
 
   if (loading) {
     return (
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "center",
-          padding: "40px",
+          py: 4,
         }}
       >
         <CircularProgress />
-      </div>
+      </Box>
     );
   }
 
@@ -69,24 +84,37 @@ export default function Livraisons() {
   }
 
   return (
-    <>
-      <Typography
-        variant="h4"
-        gutterBottom
-      >
-        Livraisons
-      </Typography>
+    <Card>
+      <CardContent>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6">
+            Livraisons du chantier
+          </Typography>
 
-      <Button
+         <Button
   variant="contained"
-  sx={{ mb: 2 }}
-  onClick={() => navigate("/livraisons/nouveau")}
+  onClick={() =>
+    navigate(
+      `/chantiers/${idChantier}/livraisons/nouveau`
+    )
+  }
 >
   + Ajouter
 </Button>
+        </Box>
 
-      <Card>
-        <CardContent>
+        {livraisons.length === 0 ? (
+          <Typography color="text.secondary">
+            Aucune livraison enregistrée pour ce chantier.
+          </Typography>
+        ) : (
           <Table>
             <TableHead>
               <TableRow>
@@ -100,10 +128,6 @@ export default function Livraisons() {
 
                 <TableCell>
                   Statut
-                </TableCell>
-
-                <TableCell>
-                  Chantier
                 </TableCell>
 
                 <TableCell>
@@ -122,31 +146,30 @@ export default function Livraisons() {
                   </TableCell>
 
                   <TableCell>
-                    {livraison.dateLivraison}
+                    {new Date(
+                      livraison.dateLivraison
+                    ).toLocaleDateString("fr-FR")}
                   </TableCell>
 
                   <TableCell>
                     {livraison.statut}
                   </TableCell>
 
-                  <TableCell>
-                    {livraison.idChantier}
-                  </TableCell>
-
-                <TableCell>
+<TableCell>
   <Button
-    variant="outlined"
     size="small"
- onClick={() =>
-  navigate(
-    `/livraisons/${livraison.idLivraison}`,
-    {
-      state: {
-        from: "livraisons",
-      },
+    variant="outlined"
+    onClick={() =>
+      navigate(
+        `/livraisons/${livraison.idLivraison}`,
+        {
+          state: {
+            from: "chantier",
+            chantierId: idChantier,
+          },
+        }
+      )
     }
-  )
-}
   >
     Voir
   </Button>
@@ -155,8 +178,8 @@ export default function Livraisons() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-    </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -18,22 +18,25 @@ import java.util.List;
 @Service
 public class DocumentService {
 
+    private final NotificationService notificationService;
     private final DocumentRepository documentRepository;
     private final ChantierRepository chantierRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final FileStorageService fileStorageService;
 
     public DocumentService(
-            DocumentRepository documentRepository,
-            ChantierRepository chantierRepository,
-            UtilisateurRepository utilisateurRepository,
-            FileStorageService fileStorageService) {
+        DocumentRepository documentRepository,
+        ChantierRepository chantierRepository,
+        UtilisateurRepository utilisateurRepository,
+        FileStorageService fileStorageService,
+        NotificationService notificationService) {
 
-        this.documentRepository = documentRepository;
-        this.chantierRepository = chantierRepository;
-        this.utilisateurRepository = utilisateurRepository;
-        this.fileStorageService = fileStorageService;
-    }
+    this.documentRepository = documentRepository;
+    this.chantierRepository = chantierRepository;
+    this.utilisateurRepository = utilisateurRepository;
+    this.fileStorageService = fileStorageService;
+    this.notificationService = notificationService;
+}
 
     /**
      * Retourne tous les documents.
@@ -109,10 +112,41 @@ public List<DocumentResponse> getDocumentsByChantier(Integer idChantier) {
                 .utilisateur(utilisateur)
                 .build();
 
-        return toResponse(
-                documentRepository.save(document)
-        );
+    Document savedDocument =
+        documentRepository.save(document);
+
+/*
+ * Notification du responsable du chantier.
+ *
+ * Pour l'instant, le destinataire est l'utilisateur
+ * responsable du chantier.
+ *
+ * Cette logique pourra évoluer plus tard vers
+ * plusieurs destinataires selon les règles métier.
+ */
+if (chantier.getUtilisateur() != null
+        && chantier.getUtilisateur().getIdUtilisateur() != null) {
+
+    Integer idDestinataire =
+            chantier.getUtilisateur().getIdUtilisateur();
+
+    notificationService.createNotification(
+            idDestinataire,
+            "Nouveau document",
+            "Un nouveau document a été ajouté au chantier "
+                    + chantier.getNom()
+                    + " : "
+                    + document.getNom(),
+            "DOCUMENT"
+    );
+}
+
+return toResponse(savedDocument);
+
+        
     }
+
+        
 
     /**
      * Met à jour un document.

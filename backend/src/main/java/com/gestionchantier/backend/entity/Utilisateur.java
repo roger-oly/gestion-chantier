@@ -1,7 +1,9 @@
 package com.gestionchantier.backend.entity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 
 @Entity
 @Table(name = "utilisateur")
@@ -26,6 +28,7 @@ public class Utilisateur {
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "mot_de_passe", nullable = false, length = 255)
     private String motDePasse;
 

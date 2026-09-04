@@ -5,7 +5,6 @@ import com.gestionchantier.backend.dto.LoginResponse;
 import com.gestionchantier.backend.entity.Utilisateur;
 import com.gestionchantier.backend.service.AuthService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,12 +32,14 @@ public LoginResponse login(
             loginRequest.getMotDePasse()
     );
 
-    return new LoginResponse(
-            utilisateur.getIdUtilisateur(),
-            utilisateur.getNom(),
-            utilisateur.getPrenom(),
-            utilisateur.getEmail(),
-            utilisateur.getRole().getLibelle()
-    );
+  return new LoginResponse(
+        utilisateur.getIdUtilisateur(),
+        utilisateur.getNom(),
+        utilisateur.getPrenom(),
+        utilisateur.getEmail(),
+        utilisateur.getTelephone(),
+        utilisateur.getStatut(),
+        utilisateur.getRole()
+);
 }
 }

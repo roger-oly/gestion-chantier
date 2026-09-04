@@ -1,11 +1,13 @@
 package com.gestionchantier.backend.controller;
 
+import com.gestionchantier.backend.dto.ChangePasswordRequest;
 import com.gestionchantier.backend.entity.Utilisateur;
 import com.gestionchantier.backend.service.UtilisateurService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/utilisateurs")
 public class UtilisateurController {
@@ -20,6 +22,11 @@ public class UtilisateurController {
     public List<Utilisateur> getUtilisateurs() {
         return utilisateurService.getAllUtilisateurs();
     }
+
+    @GetMapping("/{id}")
+public Utilisateur getUtilisateurById(@PathVariable Integer id) {
+    return utilisateurService.getUtilisateurById(id);
+}
 
     @PostMapping
     public Utilisateur saveUtilisateur(@RequestBody Utilisateur utilisateur) {
@@ -38,4 +45,16 @@ public class UtilisateurController {
     public void deleteUtilisateur(@PathVariable Integer id) {
         utilisateurService.deleteUtilisateur(id);
     }
+
+    @PutMapping("/{id}/mot-de-passe")
+public void changePassword(
+        @PathVariable Integer id,
+        @RequestBody ChangePasswordRequest request) {
+
+    utilisateurService.changePassword(
+            id,
+            request.getAncienMotDePasse(),
+            request.getNouveauMotDePasse()
+    );
+}
 }

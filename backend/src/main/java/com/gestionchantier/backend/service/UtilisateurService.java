@@ -23,6 +23,15 @@ public class UtilisateurService {
         return utilisateurRepository.findAll();
     }
 
+    public Utilisateur getUtilisateurById(Integer id) {
+    return utilisateurRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException(
+                            "Utilisateur introuvable"
+                    )
+            );
+}
+
     /**
      * Enregistre un nouvel utilisateur.
      */
@@ -56,4 +65,24 @@ public class UtilisateurService {
 
         utilisateurRepository.deleteById(id);
     }
+
+    public void changePassword(
+        Integer id,
+        String ancienMotDePasse,
+        String nouveauMotDePasse) {
+
+    Utilisateur utilisateur = utilisateurRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException(
+                            "Utilisateur introuvable"));
+
+    if (!utilisateur.getMotDePasse().equals(ancienMotDePasse)) {
+        throw new IllegalArgumentException(
+                "Ancien mot de passe incorrect");
+    }
+
+    utilisateur.setMotDePasse(nouveauMotDePasse);
+
+    utilisateurRepository.save(utilisateur);
+}
 }

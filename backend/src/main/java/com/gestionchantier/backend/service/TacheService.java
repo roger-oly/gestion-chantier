@@ -16,13 +16,19 @@ public class TacheService {
 
     private final TacheRepository tacheRepository;
     private final ChantierRepository chantierRepository;
+    private final AvancementService avancementService;
+    private final NotificationService notificationService;
 
     public TacheService(
             TacheRepository tacheRepository,
-            ChantierRepository chantierRepository) {
+            ChantierRepository chantierRepository,
+            AvancementService avancementService,
+            NotificationService notificationService) {
 
         this.tacheRepository = tacheRepository;
         this.chantierRepository = chantierRepository;
+        this.avancementService = avancementService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -37,40 +43,40 @@ public class TacheService {
     }
 
     /**
- * Retourne les tâches associées à un chantier.
- */
-public List<TacheResponse> getTachesByChantier(Integer idChantier) {
+     * Retourne les tâches associées à un chantier.
+     */
+    public List<TacheResponse> getTachesByChantier(Integer idChantier) {
 
-    return tacheRepository
-            .findByChantier_IdChantier(idChantier)
-            .stream()
-            .map(this::toResponse)
-            .toList();
-}
+        return tacheRepository
+                .findByChantier_IdChantier(idChantier)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
 
     /**
-     * Retourne les tâches par l'id.
+     * Retourne une tâche par son identifiant.
      */
-
     public TacheResponse getTacheById(Integer id) {
 
-    Tache tache = tacheRepository.findById(id)
-            .orElseThrow(() ->
-                    new ResourceNotFoundException("Tache introuvable"));
+        Tache tache = tacheRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Tache introuvable"));
 
-    return toResponse(tache);
-
-
-}
+        return toResponse(tache);
+    }
 
     /**
      * Enregistre une nouvelle tâche.
      */
     public TacheResponse saveTache(TacheRequest request) {
 
-        Chantier chantier = chantierRepository.findById(request.getIdChantier())
+        Chantier chantier = chantierRepository
+                .findById(request.getIdChantier())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Chantier introuvable"));
+                        new ResourceNotFoundException(
+                                "Chantier introuvable"));
 
         Tache tache = new Tache();
 
@@ -87,26 +93,94 @@ public List<TacheResponse> getTachesByChantier(Integer idChantier) {
 
     /**
      * Met à jour une tâche.
+     *
+     * Si la modification entraîne un changement
+     * du pourcentage d'avancement du chantier,
+     * une notification est envoyée au responsable
+     * du chantier.
      */
     public TacheResponse updateTache(
             Integer id,
             TacheRequest request) {
 
-        Tache existingTache = tacheRepository.findById(id)
+        Tache existingTache = tacheRepository
+                .findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Tache introuvable"));
+                        new ResourceNotFoundException(
+                                "Tache introuvable"));
 
-        Chantier chantier = chantierRepository.findById(request.getIdChantier())
+        /*
+         * Chantier avant modification.
+         */
+        Chantier ancienChantier = existingTache.getChantier();
+
+        Integer ancienIdChantier =
+                ancienChantier.getIdChantier();
+
+        /*
+         * Avancement avant modification.
+         */
+        int ancienPourcentage =
+                avancementService.calculerPourcentage(
+                        ancienIdChantier
+                );
+
+        /*
+         * Nouveau chantier.
+         */
+        Chantier nouveauChantier = chantierRepository
+                .findById(request.getIdChantier())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Chantier introuvable"));
+                        new ResourceNotFoundException(
+                                "Chantier introuvable"));
 
+        /*
+         * Modification de la tâche.
+         */
         existingTache.setTitre(request.getTitre());
         existingTache.setDescription(request.getDescription());
         existingTache.setStatut(request.getStatut());
         existingTache.setNiveauPriorite(request.getNiveauPriorite());
-        existingTache.setChantier(chantier);
+        existingTache.setChantier(nouveauChantier);
 
-        Tache updatedTache = tacheRepository.save(existingTache);
+        /*
+         * Enregistrement de la modification.
+         */
+        Tache updatedTache =
+                tacheRepository.save(existingTache);
+
+        /*
+         * Avancement après modification.
+         */
+        int nouveauPourcentage =
+                avancementService.calculerPourcentage(
+                        nouveauChantier.getIdChantier()
+                );
+
+        /*
+         * Notification uniquement si l'avancement
+         * du chantier a réellement changé.
+         */
+        if (ancienPourcentage != nouveauPourcentage
+                && nouveauChantier.getUtilisateur() != null
+                && nouveauChantier.getUtilisateur()
+                        .getIdUtilisateur() != null) {
+
+            Integer idDestinataire =
+                    nouveauChantier.getUtilisateur()
+                            .getIdUtilisateur();
+
+            notificationService.createNotification(
+                    idDestinataire,
+                    "Mise à jour de l'avancement",
+                    "Le chantier \""
+                            + nouveauChantier.getNom()
+                            + "\" est maintenant à "
+                            + nouveauPourcentage
+                            + "%. Veuillez valider cette mise à jour.",
+                    "AVANCEMENT"
+            );
+        }
 
         return toResponse(updatedTache);
     }
@@ -116,9 +190,11 @@ public List<TacheResponse> getTachesByChantier(Integer idChantier) {
      */
     public void deleteTache(Integer id) {
 
-        Tache tache = tacheRepository.findById(id)
+        Tache tache = tacheRepository
+                .findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Tache introuvable"));
+                        new ResourceNotFoundException(
+                                "Tache introuvable"));
 
         tacheRepository.delete(tache);
     }
@@ -134,8 +210,12 @@ public List<TacheResponse> getTachesByChantier(Integer idChantier) {
                 .description(tache.getDescription())
                 .statut(tache.getStatut())
                 .niveauPriorite(tache.getNiveauPriorite())
-                .idChantier(tache.getChantier().getIdChantier())
-                .nomChantier(tache.getChantier().getNom())
+                .idChantier(
+                        tache.getChantier().getIdChantier()
+                )
+                .nomChantier(
+                        tache.getChantier().getNom()
+                )
                 .build();
     }
 }

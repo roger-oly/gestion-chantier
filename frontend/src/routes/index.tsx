@@ -23,7 +23,18 @@ import ShowIncident from "../pages/incidents/Show";
 import EditIncident from "../pages/incidents/Edit";
 
 import Livraisons from "../pages/livraisons";
+import CreateLivraison from "../pages/livraisons/Create";
+import ShowLivraison from "../pages/livraisons/Show";
+import LivraisonDetail from "../pages/livraisons/Detail";
+
+
 import Utilisateurs from "../pages/utilisateurs";
+import CreateUtilisateur from "../pages/utilisateurs/Create";
+
+import EditUtilisateur from "../pages/utilisateurs/Edit";
+
+import Notifications from "../pages/notifications";
+
 import Profil from "../pages/profil";
 
 
@@ -191,20 +202,43 @@ export default function AppRoutes() {
   element={<ShowIncident />}
 />
 
+
 <Route
   path="/incidents/:id/modifier"
   element={<EditIncident />}
 />
 
+<Route
+  path="/livraisons"
+  element={
+    <ProtectedRoute>
+      <Livraisons />
+    </ProtectedRoute>
+  }
+/>
 
-        <Route
-          path="/livraisons"
-          element={
-            <ProtectedRoute>
-          <Livraisons />
-            </ProtectedRoute>
-        }
-        />
+<Route
+  path="/livraisons/nouveau"
+  element={
+    <ProtectedRoute>
+      <CreateLivraison />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/livraisons/:id"
+  element={
+    <ProtectedRoute>
+      <ShowLivraison />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/chantiers/:id/livraisons/nouveau"
+  element={<CreateLivraison />}
+/>
 
 
         <Route
@@ -215,6 +249,15 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
         />
+
+        <Route
+  path="/utilisateurs/:id/modifier"
+  element={
+    <ProtectedRoute>
+      <EditUtilisateur />
+    </ProtectedRoute>
+  }
+/>
 
 
         <Route
@@ -233,6 +276,20 @@ export default function AppRoutes() {
         <CreateChantier />
         </ProtectedRoute>
   }
+/>
+
+<Route
+  path="/utilisateurs/nouveau"
+  element={
+    <ProtectedRoute>
+      <CreateUtilisateur />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/notifications"
+  element={<Notifications />}
 />
 
 

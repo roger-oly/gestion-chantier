@@ -14,21 +14,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
     private final ChantierRepository chantierRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final NotificationService notificationService;
 
-    public IncidentService(
-            IncidentRepository incidentRepository,
-            ChantierRepository chantierRepository,
-            UtilisateurRepository utilisateurRepository) {
+public IncidentService(
+        IncidentRepository incidentRepository,
+        ChantierRepository chantierRepository,
+        UtilisateurRepository utilisateurRepository,
+        NotificationService notificationService) {
 
-        this.incidentRepository = incidentRepository;
-        this.chantierRepository = chantierRepository;
-        this.utilisateurRepository = utilisateurRepository;
-    }
+    this.incidentRepository = incidentRepository;
+    this.chantierRepository = chantierRepository;
+    this.utilisateurRepository = utilisateurRepository;
+    this.notificationService = notificationService;
+}
 
     /**
      * Retourne tous les incidents.
@@ -93,7 +97,17 @@ public class IncidentService {
         incident.setChantier(chantier);
         incident.setUtilisateur(utilisateur);
 
-        return incidentRepository.save(incident);
+      Incident savedIncident = incidentRepository.save(incident);
+
+notificationService.createNotification(
+        utilisateur.getIdUtilisateur(),
+        "Nouvel incident",
+        "Un nouvel incident a été enregistré sur le chantier "
+                + chantier.getNom(),
+        "INCIDENT"
+);
+
+return savedIncident;
     }
 
     /**

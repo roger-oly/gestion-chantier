@@ -29,6 +29,9 @@ import ChantierAvancement
 import ChantierIncidents
   from "../../components/features/incident/ChantierIncidents";
 
+import ChantierLivraisons
+  from "../../components/features/livraison/ChantierLivraisons";
+
 import {
   getChantierById,
   deleteChantier,
@@ -348,14 +351,10 @@ async function handleDelete() {
 
 
             {tab === 5 && (
-
-              <Typography>
-
-                Livraisons du chantier
-
-              </Typography>
-
-            )}
+  <ChantierLivraisons
+    idChantier={chantier.idChantier}
+  />
+)}
 
 
           </Box>

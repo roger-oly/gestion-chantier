@@ -15,3 +15,7 @@ spring:
 
 file:
   upload-dir: uploads/documents
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 28800000

@@ -21,4 +21,6 @@ public class LoginResponse {
     private String statut;
 
     private Role role;
+
+    private String token;
 }

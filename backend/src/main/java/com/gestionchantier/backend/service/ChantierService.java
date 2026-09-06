@@ -1,5 +1,8 @@
 package com.gestionchantier.backend.service;
 
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.gestionchantier.backend.exception.ResourceNotFoundException;
 import com.gestionchantier.backend.entity.Utilisateur;
 import com.gestionchantier.backend.dto.ChantierResponse;
@@ -32,7 +35,18 @@ public class ChantierService {
     /**
      * Retourne tous les chantiers.
      */
-    public List<ChantierResponse> getAllChantiers() {
+   public List<ChantierResponse> getAllChantiers() {
+
+    Authentication authentication =
+            SecurityContextHolder
+                    .getContext()
+                    .getAuthentication();
+
+    /*
+     * Administrateur et Direction :
+     * accès à tous les chantiers.
+     */
+    if (estAdministrateurOuDirection()) {
 
         return chantierRepository.findAll()
                 .stream()
@@ -40,86 +54,100 @@ public class ChantierService {
                 .toList();
     }
 
+    /*
+     * Autres utilisateurs :
+     * uniquement les chantiers qui leur sont attribués.
+     */
+    if (authentication == null) {
+        throw new AccessDeniedException(
+                "Utilisateur non authentifié"
+        );
+    }
+
+    String emailUtilisateur = authentication.getName();
+
+    return chantierRepository.findAll()
+            .stream()
+            .filter(chantier ->
+                    chantier.getUtilisateur() != null
+                            && emailUtilisateur.equals(
+                                    chantier.getUtilisateur().getEmail()
+                            )
+            )
+            .map(this::toResponse)
+            .toList();
+}
+
     /**
      * Retourne un chantier selon l'id.
      */
-    public ChantierResponse getChantierById(Integer id) {
+   public ChantierResponse getChantierById(Integer id) {
 
-        Chantier chantier = chantierRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Chantier introuvable"
-                        )
-                );
+    Chantier chantier = chantierRepository.findById(id)
+            .orElseThrow(() ->
+                    new ResourceNotFoundException(
+                            "Chantier introuvable"
+                    )
+            );
 
-        return ChantierResponse.builder()
+    Authentication authentication =
+            SecurityContextHolder
+                    .getContext()
+                    .getAuthentication();
 
-                .idChantier(
-                        chantier.getIdChantier()
-                )
-
-                .nom(
-                        chantier.getNom()
-                )
-
-                .description(
-                        chantier.getDescription()
-                )
-
-                .localisation(
-                        chantier.getLocalisation()
-                )
-
-                .budget(
-                        chantier.getBudget()
-                )
-
-                .dateDebut(
-                        chantier.getDateDebut()
-                )
-
-                .dateFinPrevue(
-                        chantier.getDateFinPrevue()
-                )
-
-                .statut(
-                        chantier.getStatut()
-                )
-
-                .idUtilisateur(
-                        chantier.getUtilisateur() != null
-                                ? chantier.getUtilisateur()
-                                        .getIdUtilisateur()
-                                : null
-                )
-
-                .nomUtilisateur(
-                        chantier.getUtilisateur() != null
-                                ? chantier.getUtilisateur().getNom()
-                                        + " "
-                                        + chantier.getUtilisateur().getPrenom()
-                                : null
-                )
-
-                .build();
+    /*
+     * Administrateur et Direction :
+     * accès à tous les chantiers.
+     */
+    if (estAdministrateurOuDirection()) {
+        return toResponse(chantier);
     }
+
+    /*
+     * Les autres utilisateurs ne peuvent consulter
+     * que les chantiers qui leur sont attribués.
+     */
+    if (chantier.getUtilisateur() == null
+            || authentication == null
+            || !chantier.getUtilisateur()
+                    .getEmail()
+                    .equals(authentication.getName())) {
+
+        throw new AccessDeniedException(
+                "Accès interdit à ce chantier"
+        );
+    }
+
+    return toResponse(chantier);
+}
+
 
     /**
      * Enregistre un nouveau chantier.
      */
-    public ChantierResponse saveChantier(
-            ChantierRequest request
-    ) {
+   public ChantierResponse saveChantier(
+        ChantierRequest request
+) {
 
-        Utilisateur utilisateur =
-                utilisateurRepository.findById(
-                        request.getIdUtilisateur()
-                )
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(
-                                "Utilisateur introuvable"
-                        )
-                );
+    Utilisateur utilisateur =
+            utilisateurRepository.findById(
+                    request.getIdUtilisateur()
+            )
+            .orElseThrow(
+                    () -> new ResourceNotFoundException(
+                            "Utilisateur introuvable"
+                    )
+            );
+
+    if (utilisateur.getRole() == null
+            || !"RESPONSABLE_PROJET".equals(
+                    utilisateur.getRole().getLibelle()
+            )) {
+
+        throw new AccessDeniedException(
+                "Le chantier doit être attribué à un responsable de projet"
+        );
+    }
 
         Chantier chantier = Chantier.builder()
 
@@ -215,6 +243,25 @@ public class ChantierService {
                                 )
                         );
 
+                        Authentication authentication =
+        SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+if (!estAdministrateurOuDirection()) {
+
+    if (authentication == null
+            || existingChantier.getUtilisateur() == null
+            || !existingChantier.getUtilisateur()
+                    .getEmail()
+                    .equals(authentication.getName())) {
+
+        throw new AccessDeniedException(
+                "Vous n'êtes pas autorisé à modifier ce chantier"
+        );
+    }
+}
+
         /*
          * On mémorise l'ancien responsable
          * avant toute modification.
@@ -237,6 +284,16 @@ public class ChantierService {
                                 "Utilisateur introuvable"
                         )
                 );
+
+                if (utilisateur.getRole() == null
+        || !"RESPONSABLE_PROJET".equals(
+                utilisateur.getRole().getLibelle()
+        )) {
+
+    throw new AccessDeniedException(
+            "Le chantier doit être attribué à un responsable de projet"
+    );
+}
 
         existingChantier.setNom(request.getNom());
         existingChantier.setDescription(request.getDescription());
@@ -278,14 +335,60 @@ public class ChantierService {
     /**
      * Supprime un chantier.
      */
-    public void deleteChantier(Integer id) {
+  public void deleteChantier(Integer id) {
 
-        chantierRepository.deleteById(id);
+    Authentication authentication =
+            SecurityContextHolder
+                    .getContext()
+                    .getAuthentication();
+
+    if (authentication == null
+            || authentication.getAuthorities()
+                    .stream()
+                    .noneMatch(authority ->
+                            authority.getAuthority()
+                                    .equals("ROLE_ADMINISTRATEUR"))) {
+
+        throw new AccessDeniedException(
+                "Seul un administrateur peut supprimer un chantier"
+        );
     }
+
+    Chantier chantier =
+            chantierRepository.findById(id)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Chantier introuvable"
+                            )
+                    );
+
+    chantierRepository.delete(chantier);
+}
 
     /**
      * Transforme une entité Chantier en ChantierResponse.
      */
+
+    private boolean estAdministrateurOuDirection() {
+
+    Authentication authentication =
+            SecurityContextHolder
+                    .getContext()
+                    .getAuthentication();
+
+    if (authentication == null) {
+        return false;
+    }
+
+    return authentication.getAuthorities()
+            .stream()
+            .anyMatch(authority ->
+                    authority.getAuthority().equals("ROLE_ADMINISTRATEUR")
+                            || authority.getAuthority().equals("ROLE_DIRECTION")
+            );
+}
+
+
     private ChantierResponse toResponse(
             Chantier chantier) {
 
